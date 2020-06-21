@@ -7,6 +7,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/faiface/beep"
+
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
 	"github.com/urfave/cli"
 )
 
@@ -48,7 +52,29 @@ func main() {
 						select {
 						case <-done:
 							fmt.Println("Done!")
-							//TODO: Add a beep sound with beep library: https://github.com/faiface/beep/wiki/Hello,-Beep!
+
+							//TODO: change path to find beep mp3
+							f, err := os.Open("beep-06.mp3")
+							if err != nil {
+								log.Fatal(err)
+							}
+
+							streamer, format, err := mp3.Decode(f)
+							if err != nil {
+								log.Fatal(err)
+							}
+							defer streamer.Close()
+
+							//Initialize the speaker to play the sound. We only want to initialize this once
+							speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+
+							done := make(chan bool)
+							speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+								done <- true
+							})))
+
+							<-done
+
 							return nil
 						case t := <-ticker.C:
 							fmt.Println("Current time: ", t)
