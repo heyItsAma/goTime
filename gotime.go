@@ -14,6 +14,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+//TODO: add authors, clean up code, timer ui
+
 func main() {
 
 	app := &cli.App{
@@ -54,6 +56,7 @@ func main() {
 							fmt.Println("Done!")
 
 							//TODO: change path to find beep mp3
+							//TODO: Extract function from here!
 							f, err := os.Open("beep-06.mp3")
 							if err != nil {
 								log.Fatal(err)
